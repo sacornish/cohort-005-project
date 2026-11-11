@@ -128,6 +128,24 @@ const STAT_ICONS: Record<LandingStatKey, typeof BookOpen> = {
   pace: Clock,
 };
 
+const HERO_FEATURES = [
+  {
+    title: "Structured courses",
+    detail: "Built by experienced instructors, module by module.",
+    Icon: BookOpen,
+  },
+  {
+    title: "Track your progress",
+    detail: "Pick up where you left off, on your schedule.",
+    Icon: Clock,
+  },
+  {
+    title: "Take quizzes",
+    detail: "Check what you have learned before moving on.",
+    Icon: GraduationCap,
+  },
+];
+
 export function meta() {
   return [
     { title: "Cadence — Learn at your own pace" },
@@ -269,36 +287,27 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </Button>
           </div>
         </div>
-        {featuredCourses.length > 0 && (
-          <div className="rounded-xl border border-border bg-muted/40 p-6">
-            <p className="mb-4 text-sm font-semibold text-muted-foreground">
-              Newest courses
-            </p>
-            <ul className="space-y-3">
-              {featuredCourses.map((course) => (
-                <li key={course.id}>
-                  <Link
-                    to={`/courses/${course.slug}`}
-                    className="group flex items-start gap-3 rounded-lg border border-border bg-background p-4 transition-shadow hover:shadow-md"
-                  >
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                      <BookOpen className="size-5 text-primary" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold group-hover:text-primary">
-                        {course.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {course.instructorName ?? "Instructor"} ·{" "}
-                        {lessonCountLabel(course.lessonCount)}
-                      </p>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <div className="rounded-xl border border-border bg-muted/40 p-6">
+          <p className="mb-4 text-sm font-semibold text-muted-foreground">
+            What you get
+          </p>
+          <ul className="space-y-3">
+            {HERO_FEATURES.map(({ title, detail, Icon }) => (
+              <li
+                key={title}
+                className="flex items-start gap-3 rounded-lg border border-border bg-background p-4"
+              >
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <Icon className="size-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold">{title}</p>
+                  <p className="text-xs text-muted-foreground">{detail}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section className="border-y border-border bg-muted/50 py-12">
