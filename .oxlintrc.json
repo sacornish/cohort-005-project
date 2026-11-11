@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "react", "jsx-a11y", "import", "vitest"],
-  "jsPlugins": ["./lint-rules/sql-raw.js"],
+  "jsPlugins": ["./lint-rules/sql-raw.js", "./lint-rules/standards.js"],
   "categories": {
     "correctness": "error"
   },
@@ -86,9 +86,52 @@
     "import/no-default-export": "error",
     "vitest/no-disabled-tests": "error",
     "vitest/no-focused-tests": "error",
-    "sql/no-dynamic-raw": "error"
+    "sql/no-dynamic-raw": "error",
+    "standards/no-number-of-input": "error"
   },
   "overrides": [
+    {
+      "files": ["app/components/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["**/+types/*"],
+                "message": "A component may not import its route's generated +types. Take the props it needs as its own type, or import a type exported by the module that loads the data."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/modules/**"],
+      "rules": {
+        "standards/no-ambient-clock": "error"
+      }
+    },
+    {
+      "files": ["app/modules/*/tests/**"],
+      "rules": {
+        "standards/no-ambient-clock": "off"
+      }
+    },
+    // Parsed input with Number() before the rule existed. Remove each entry
+    // once its ids go through a zod schema.
+    {
+      "files": [
+        "app/routes/courses.$slug.$moduleId.tsx",
+        "app/routes/courses.$slug.lessons.$lessonId.tsx",
+        "app/routes/instructor.$courseId.lessons.$lessonId.quiz.tsx",
+        "app/routes/instructor.$courseId.lessons.$lessonId.tsx",
+        "app/routes/instructor.$courseId.modules.$moduleId.tsx"
+      ],
+      "rules": {
+        "standards/no-number-of-input": "off"
+      }
+    },
     {
       "files": [
         "app/routes/**",
@@ -120,7 +163,9 @@
         "typescript/no-explicit-any": "off"
       }
     },
-    // Files already over a size limit. Remove each entry once the file is split.
+    // Code already over a size limit. When a file is split, its entry follows
+    // the moved code to the new files that still need it; remove an entry once
+    // its code is under the limit.
     {
       "files": [
         "app/lib/comments.server.test.ts",

@@ -12,6 +12,30 @@ npm install -g agent-browser
 agent-browser install
 ```
 
+The agent workflows in `.github/workflows/` run this for you, through
+`.github/actions/setup-agent-browser`.
+
+## Signing in as someone
+
+The app has no login in dev: the session holds a user id, set by a POST to
+`/api/switch-user`. Open any page first so the fetch is same-origin:
+
+```bash
+agent-browser open http://localhost:5173/courses
+agent-browser eval "fetch('/api/switch-user?redirectTo=/', {method:'POST', body:new URLSearchParams({userId:'5'})}).then(r=>r.status)"
+agent-browser open http://localhost:5173/courses/introduction-to-typescript/lessons/1
+```
+
+The seed's users:
+
+| id  | role       | note                                                      |
+| --- | ---------- | --------------------------------------------------------- |
+| 1   | admin      |                                                           |
+| 2–4 | instructor |                                                           |
+| 5   | student    | enrolled in `introduction-to-typescript`, so lessons open |
+
+For anyone else, ask the database: `sqlite3 data.db "select id, role from users"`.
+
 ## Asking your own question
 
 Start the app with `npm run dev` first. The examples below use

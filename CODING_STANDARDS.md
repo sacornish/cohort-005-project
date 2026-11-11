@@ -18,7 +18,9 @@ Form data, search parameters and request bodies get a zod schema before the
 values reach any query. Parse once, at the boundary; after that the value has
 a type and you do not check it again. Coerce numbers through the schema, not
 `Number()`: `Number("")` is `0`, and an empty `lessonId` once opened lesson 0
-for every learner.
+for every learner. oxlint's `standards/no-number-of-input` catches `Number()`
+on `params` and on `.get()`; a value read any other way, such as from
+`formData.entries()`, is yours to catch.
 
 ## Check permission in the action, not only the loader
 
@@ -42,9 +44,23 @@ Test setup calls the module's own functions. When the function you need does
 not exist, add it to the module rather than inserting rows directly, so a
 change to how the module stores its data leaves its tests alone.
 
-## Keep files under 5000 tokens
+## Keep a pull request to its ticket; split a file in its own commit
 
-Keep every file under 5000 tokens.
+A pull request carries its ticket and nothing else. The one exception is a
+split forced by the pre-commit hook's 5000-token limit
+(`npm run tokens:oversized` lists those files). It arrives as its own commit,
+before the ticket's change: the code moved unchanged, its `.oxlintrc.json`
+exemptions moved with it. A reviewer then checks the split for a faithful
+move, and the change for the ticket, one at a time. The lesson notes restyle
+arrived as one commit with a 2,000-line route split inside it.
+
+## Share one schema between the form and the action
+
+When the browser checks a field the action also checks (a length limit, a
+blank check, "unsaved changes"), both read the same zod schema from a file
+that is not `.server`, so the browser judges the value the server will store.
+The notes editor counted the raw text while the action trimmed it, and a note
+ending in a newline showed "Unsaved changes" forever.
 
 ## Wrap related writes in a transaction
 
@@ -80,7 +96,8 @@ files and `"Pending"` in one.
 
 A function that calls `Date.now()` cannot be tested at a fixed moment. Take
 the time as an argument. The refund window tests failed every night at
-midnight until we did this.
+midnight until we did this. oxlint enforces this in `app/modules/`; apply it
+elsewhere by hand.
 
 ## Keep secrets on the server
 

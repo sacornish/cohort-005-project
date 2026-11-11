@@ -132,6 +132,9 @@ jobs:
       - name: Install GitHub Copilot
         run: npm install -g @github/copilot
 
+      - name: Set up agent-browser
+        uses: ./.github/actions/setup-agent-browser
+
       - name: Migrate and seed the database
         # The agent gets a real database, because half of this repo's checks
         # need one. It is disposable: a fresh one, migrated and seeded, on
