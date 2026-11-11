@@ -26,6 +26,8 @@ export const reviewSchema = z
             ),
         })
       )
-      .describe("One entry per finding you left unfixed. Empty is fine."),
+      .describe(
+        "One entry per finding you left unfixed on a line the diff touches. Empty is fine."
+      ),
   })
   .describe("The review's inline comments.");

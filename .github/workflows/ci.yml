@@ -1,0 +1,40 @@
+name: CI
+
+# Runs the repository's checks on every pull request and on main. The
+# pre-commit hook skips the tests to stay fast; this is where they run.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Migrate and seed the database
+        run: |
+          npm run db:migrate
+          npm run db:seed
+
+      - run: npm run check
+
+      - run: npm run build

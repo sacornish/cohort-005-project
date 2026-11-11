@@ -21,7 +21,7 @@ Include filenames, and lines of code. Remember that the agent that implements wi
    - A duplicate's comment is ONE line: why it is the same issue. The workflow adds "Closed as duplicate of #N." under it.
    - A survivor's comment is skimmable, about 20 lines. Use the style guide in the /pr skill.
      - whether the issue's claims hold up against the code, with evidence.
-     - the blast radius, in prose: the 2–3 places that matter (modules under app/modules/, routes, tables). A schema change or a migration goes first, and loudly;
+     - the blast radius, in prose: the 2–3 places that matter (modules under app/modules/, routes, tables). A schema change or a migration goes first, and loudly. Name any of those files that `npm run tokens:oversized` lists: the implementer must split it in its own commit before changing it;
      - whether it's a one-way or a two-way door
      - the duplicates closed onto it, crediting by number any detail only they had;
      - last, the open questions a human has to settle. An empty list is a claim, and usually a wrong one.

@@ -1,8 +1,10 @@
 // Fails when a file is too big for an agent to read and edit in one go.
 // Tokens are estimated as bytes / 4, which is close enough for code.
 // Usage: node scripts/check-file-tokens.js <file>...
+//        node scripts/check-file-tokens.js --list   (every tracked file over the limit; never fails)
 
-import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { readFileSync, statSync } from "node:fs";
 
 const MAX_TOKENS = 5000;
 const BYTES_PER_TOKEN = 4;
@@ -17,8 +19,14 @@ const IGNORED = [
 
 const isBinary = (contents) => contents.subarray(0, 8000).includes(0);
 
-const oversized = process.argv
-  .slice(2)
+const listMode = process.argv[2] === "--list";
+const files = listMode
+  ? execFileSync("git", ["ls-files", "-z"], { encoding: "utf8" })
+      .split("\0")
+      .filter((file) => statSync(file, { throwIfNoEntry: false })?.isFile())
+  : process.argv.slice(2);
+
+const oversized = files
   .map((file) => file.replaceAll("\\", "/").replace(`${process.cwd()}/`, ""))
   .filter((file) => !IGNORED.some((pattern) => pattern.test(file)))
   .map((file) => ({ file, contents: readFileSync(file) }))
@@ -29,6 +37,13 @@ const oversized = process.argv
   }))
   .filter(({ tokens }) => tokens > MAX_TOKENS);
 
+if (listMode) {
+  for (const { file, tokens } of oversized) {
+    console.log(`${file}: ~${tokens} tokens`);
+  }
+  process.exit(0);
+}
+
 if (oversized.length > 0) {
   console.error(`These files are over ${MAX_TOKENS} tokens (bytes / 4):\n`);
   for (const { file, tokens } of oversized) {
@@ -36,7 +51,8 @@ if (oversized.length > 0) {
   }
   console.error(`
 Split each file before you commit. Do not delete code or squash it onto fewer
-lines to get under the limit.
+lines to get under the limit. Make the split its own commit: move the code
+unchanged, with no behaviour change, and commit your change on top of it.
 
 How to split:
 - Find the seams. Look for groups of functions, components, or tests that

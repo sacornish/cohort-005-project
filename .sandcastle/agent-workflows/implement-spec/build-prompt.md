@@ -15,6 +15,12 @@ Read CODING_STANDARDS.md.
 - The review workflow checks you against the ticket's "Done when". Reread it
   before you stop.
 - `npm run build` must pass too.
+- Before you edit a file, check it against `npm run tokens:oversized`. The
+  pre-commit hook rejects a listed file, so split it first: move its code
+  unchanged into a commit of its own, then build the ticket on top. Name the
+  split in your summary.
+- Run `npm run test:mutation` once, after the hook has accepted your commits.
+  It measures from where the branch started.
 - Commit with `git commit` on the current branch. When the pre-commit hook
   rejects a commit, fix the work and commit again. The hook stays as it is:
   no `--no-verify`, no edits to `.husky/`, `scripts/pre-commit.sh` or

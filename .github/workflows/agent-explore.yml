@@ -162,6 +162,10 @@ jobs:
         if: steps.batch.outputs.numbers != '[]'
         run: npm install -g @github/copilot
 
+      - name: Set up agent-browser
+        if: steps.batch.outputs.numbers != '[]'
+        uses: ./.github/actions/setup-agent-browser
+
       - name: Explore
         if: steps.batch.outputs.numbers != '[]'
         env:
