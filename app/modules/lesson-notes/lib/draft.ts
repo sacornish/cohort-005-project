@@ -28,10 +28,13 @@ export function describeDraft({
   saving,
   error,
 }: NoteDraftInput): NoteDraftState {
-  const length = draft.length;
+  // The server trims before checking the limit and storing, so compare what
+  // it would keep, not the raw box.
+  const kept = draft.trim();
+  const length = kept.length;
   const tooLong = length > MAX_NOTE_LENGTH;
-  const blank = draft.trim().length === 0;
-  const changed = draft !== (savedBody ?? "");
+  const blank = length === 0;
+  const changed = kept !== (savedBody ?? "");
 
   return {
     length,

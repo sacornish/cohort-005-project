@@ -65,4 +65,16 @@ describe("describeNoteDraft", () => {
     expect(state.status).toEqual({ kind: "error", message: "Too long" });
     expect(state.canSave).toBe(true);
   });
+
+  it("reports saved once the server has stored the trimmed text", () => {
+    const state = draft({ draft: "kept\n", savedBody: "kept" });
+    expect(state.status).toEqual({ kind: "saved" });
+    expect(state.canSave).toBe(false);
+  });
+
+  it("does not count surrounding whitespace against the limit", () => {
+    const state = draft({ draft: ` ${"a".repeat(MAX)}\n` });
+    expect(state.tooLong).toBe(false);
+    expect(state.canSave).toBe(true);
+  });
 });
