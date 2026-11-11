@@ -22,7 +22,12 @@ export type NoteDraftState = {
   status: NoteDraftStatus;
 };
 
-export function describeDraft({
+/**
+ * What the lesson note editor should show for the text in the box: the
+ * character count against the limit, whether Save is allowed, and one status
+ * line (saving, error, unsaved changes, saved, or nothing written yet).
+ */
+export function describeNoteDraft({
   draft,
   savedBody,
   saving,
