@@ -42,6 +42,7 @@ describe("describeNoteDraft", () => {
 
   it("blocks Save for whitespace only, which the server would reject", () => {
     expect(draft({ draft: "   \n" }).canSave).toBe(false);
+    expect(draft({ draft: "   \n", savedBody: "kept" }).canSave).toBe(false);
   });
 
   it("allows exactly the limit and blocks one character over it", () => {
