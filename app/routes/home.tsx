@@ -388,25 +388,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       )}
 
       <footer className="border-t border-border py-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-semibold text-foreground">Cadence</p>
-            <p>Structured courses for developers, at your own pace.</p>
-          </div>
-          <nav className="flex gap-6">
-            <Link to="/courses" className="hover:text-foreground">
-              Courses
-            </Link>
-            {currentUser ? (
-              <Link to="/dashboard" className="hover:text-foreground">
-                Dashboard
-              </Link>
-            ) : (
-              <Link to="/signup" className="hover:text-foreground">
-                Sign Up
-              </Link>
-            )}
-          </nav>
+        <div className="mx-auto max-w-6xl px-6 text-sm text-muted-foreground">
+          Cadence
         </div>
       </footer>
 
