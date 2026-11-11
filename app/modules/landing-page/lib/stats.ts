@@ -6,14 +6,16 @@ export type LandingStat = {
   label: string;
 };
 
-export function pluralise(count: number, singular: string, plural: string) {
+function pluralise(count: number, singular: string, plural: string) {
   return count === 1 ? singular : plural;
 }
 
-export function buildLandingStats(counts: {
+export type LandingCounts = {
   totalCourses: number;
   totalCategories: number;
-}): LandingStat[] {
+};
+
+export function buildLandingStats(counts: LandingCounts): LandingStat[] {
   return [
     {
       key: "courses",
