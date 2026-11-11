@@ -7,6 +7,7 @@ import {
   INTENT_CAPABILITY,
   lessonRef,
   loadLessonPage,
+  parseLessonId,
   runLessonIntent,
 } from "~/modules/lesson-page/index.server";
 import { LockedLesson } from "~/components/lesson-locked";
@@ -29,7 +30,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw data("Lesson not found", { status: 404 });
   }
 
-  return loadLessonPage(decisions, Number(params.lessonId));
+  return loadLessonPage(decisions, parseLessonId(params));
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
@@ -41,7 +42,7 @@ export async function action({ params, request }: Route.ActionArgs) {
   // a malformed id) is a 404.
   const capability =
     typeof intent === "string" ? INTENT_CAPABILITY[intent] : undefined;
-  if (!capability) {
+  if (typeof intent !== "string" || !capability) {
     throw data("Invalid action", { status: 400 });
   }
   const ref = lessonRef(params);
@@ -50,10 +51,10 @@ export async function action({ params, request }: Route.ActionArgs) {
     capability,
     ref
   );
-  const lessonId = Number(params.lessonId);
+  const lessonId = parseLessonId(params);
 
   return runLessonIntent({
-    intent: intent as string,
+    intent,
     formData,
     person,
     ref,

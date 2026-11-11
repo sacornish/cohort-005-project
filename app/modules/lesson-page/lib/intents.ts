@@ -34,6 +34,8 @@ const editCommentSchema = z.object({
   body: z.string(),
 });
 
+const quizIdSchema = z.coerce.number().int().positive();
+
 const saveNoteSchema = z.object({
   body: z
     .string()
@@ -179,10 +181,11 @@ export async function runLessonIntent({
   }
 
   if (intent === "submit-quiz") {
-    const quizId = Number(formData.get("quizId"));
-    if (isNaN(quizId)) {
+    const parsedQuizId = quizIdSchema.safeParse(formData.get("quizId"));
+    if (!parsedQuizId.success) {
       throw data("Invalid quiz ID", { status: 400 });
     }
+    const quizId = parsedQuizId.data;
     // Scope the quiz to this lesson so a quiz elsewhere can't be reached by
     // posting its id to this route.
     const quiz = db.select().from(quizzes).where(eq(quizzes.id, quizId)).get();

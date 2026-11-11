@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { data } from "react-router";
 import {
   type Capability,
   type CourseRef,
@@ -12,6 +14,15 @@ export function lessonRef(params: {
   lessonId: string;
 }): CourseRef {
   return { slug: params.slug, lessonId: params.lessonId };
+}
+
+const lessonIdSchema = z.coerce.number().int().positive();
+
+/** The lesson id from the URL, or a 404 when it is not a positive integer. */
+export function parseLessonId(params: { lessonId: string }): number {
+  const parsed = lessonIdSchema.safeParse(params.lessonId);
+  if (!parsed.success) throw data("Lesson not found", { status: 404 });
+  return parsed.data;
 }
 
 /**
