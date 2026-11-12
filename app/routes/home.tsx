@@ -11,13 +11,18 @@ import {
 import { CourseStatus } from "~/db/schema";
 import {
   BookOpen,
+  Clock,
   GraduationCap,
-  Users,
   ArrowRight,
   User,
   Moon,
   Sun,
 } from "lucide-react";
+import {
+  landingStats,
+  lessonCountLabel,
+  type LandingStatKey,
+} from "~/modules/landing-page";
 import { CourseImage } from "~/components/course-image";
 import { DevUI } from "~/components/dev-ui";
 import { getCurrentUserId, getDevCountry } from "~/lib/session";
@@ -117,6 +122,30 @@ function getLessonCountForCourse(courseId: number) {
   return count?.count ?? 0;
 }
 
+const STAT_ICONS: Record<LandingStatKey, typeof BookOpen> = {
+  courses: BookOpen,
+  categories: GraduationCap,
+  pace: Clock,
+};
+
+const HERO_FEATURES = [
+  {
+    title: "Structured courses",
+    detail: "Built by experienced instructors, module by module.",
+    Icon: BookOpen,
+  },
+  {
+    title: "Track your progress",
+    detail: "Pick up where you left off, on your schedule.",
+    Icon: Clock,
+  },
+  {
+    title: "Take quizzes",
+    detail: "Check what you have learned before moving on.",
+    Icon: GraduationCap,
+  },
+];
+
 export function meta() {
   return [
     { title: "Cadence — Learn at your own pace" },
@@ -173,6 +202,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     countryTierInfo,
     countries,
   } = loaderData;
+  const stats = landingStats({ totalCourses, totalCategories });
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -234,51 +264,68 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-6 py-24 text-center">
-        <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
-          Learn to code,
-          <br />
-          <span className="text-muted-foreground">at your own pace</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-          Structured courses built by experienced instructors. Track your
-          progress, take quizzes, and build real-world skills.
-        </p>
-        <div className="mt-10 flex items-center justify-center gap-4">
-          <Button asChild size="lg">
-            <Link to="/courses">
-              Browse Courses
-              <ArrowRight className="ml-2 size-4" />
-            </Link>
-          </Button>
+      <section className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[3fr_2fr]">
+        <div>
+          <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">
+            Courses for developers
+          </p>
+          <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
+            Learn to code,
+            <br />
+            <span className="text-muted-foreground">at your own pace</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lg text-muted-foreground">
+            Structured courses built by experienced instructors. Track your
+            progress, take quizzes, and build real-world skills.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <Button asChild size="lg">
+              <Link to="/courses">
+                Browse Courses
+                <ArrowRight className="ml-2 size-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+        <div className="rounded-xl border border-border bg-muted/40 p-6">
+          <p className="mb-4 text-sm font-semibold text-muted-foreground">
+            What you get
+          </p>
+          <ul className="space-y-3">
+            {HERO_FEATURES.map(({ title, detail, Icon }) => (
+              <li
+                key={title}
+                className="flex items-start gap-3 rounded-lg border border-border bg-background p-4"
+              >
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <Icon className="size-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold">{title}</p>
+                  <p className="text-xs text-muted-foreground">{detail}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="border-y border-border bg-muted/50 py-16">
+      <section className="border-y border-border bg-muted/50 py-12">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 sm:grid-cols-3">
-          <div className="text-center">
-            <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-lg bg-primary/10">
-              <BookOpen className="size-6 text-primary" />
-            </div>
-            <p className="text-2xl font-bold">{totalCourses}</p>
-            <p className="text-sm text-muted-foreground">Available Courses</p>
-          </div>
-          <div className="text-center">
-            <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-lg bg-primary/10">
-              <GraduationCap className="size-6 text-primary" />
-            </div>
-            <p className="text-2xl font-bold">{totalCategories}</p>
-            <p className="text-sm text-muted-foreground">Categories</p>
-          </div>
-          <div className="text-center">
-            <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-lg bg-primary/10">
-              <Users className="size-6 text-primary" />
-            </div>
-            <p className="text-2xl font-bold">Self-paced</p>
-            <p className="text-sm text-muted-foreground">
-              Learn on your schedule
-            </p>
-          </div>
+          {stats.map((stat) => {
+            const Icon = STAT_ICONS[stat.key];
+            return (
+              <div key={stat.key} className="flex items-center gap-4">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <Icon className="size-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -330,7 +377,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                     </span>
                     <span className="flex items-center gap-1">
                       <BookOpen className="size-3" />
-                      {course.lessonCount} lessons
+                      {lessonCountLabel(course.lessonCount)}
                     </span>
                   </CardFooter>
                 </Card>
@@ -341,7 +388,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       )}
 
       <footer className="border-t border-border py-8">
-        <div className="mx-auto max-w-6xl px-6 text-center text-sm text-muted-foreground">
+        <div className="mx-auto max-w-6xl px-6 text-sm text-muted-foreground">
           Cadence
         </div>
       </footer>
